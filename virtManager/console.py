@@ -205,15 +205,51 @@ class vmmConsolePages(vmmGObjectUI):
     # Initialization helpers #
     ##########################
 
+    _sysrq_keys =  ([ "loglevel%d(%d)" % (x, x) for x in range(10) ] +
+                    [ "reboot(b)",
+                      "crash(c)",
+                      "terminate-all-tasks(e)",
+                      "memory-full-oom-kill(f)",
+                      "kill-all-tasks(i)",
+                      "thaw-filesystems(j)",
+                      "sak(k)",
+                      "show-backtrace-all-active-cpus(l)",
+                      "show-memory-usage(m)",
+                      "nice-all-RT-tasks(n)",
+                      "poweroff(o)",
+                      "show-registers(p)",
+                      "show-all-timers(q)",
+                      "unraw(r)",
+                      "sync(s)",
+                      "show-task-states(t)",
+                      "unmount(u)",
+                      "force-fb(V)",
+                      "show-blocked-tasks(w)",
+                      "dump-ftrace-buffer(z)" ])
+
+    def _make_keycombo_item(self, name, combo, menu):
+        item = Gtk.MenuItem.new_with_mnemonic(name)
+        item.connect("activate", self._do_send_key, combo)
+        menu.add(item)
+
+    def _build_sysrq_menu(self):
+        menu = Gtk.Menu()
+
+        def make_item(name, combo):
+            self._make_keycombo_item(name, combo, menu)
+
+        for k in self._sysrq_keys:
+            key = k.split("(")[1][0]
+            make_item(k, ["Alt_L", "Sys_Req", key])
+
+        return menu
+
     def _build_keycombo_menu(self):
         # Shared with vmmDetails
         menu = Gtk.Menu()
 
         def make_item(name, combo):
-            item = Gtk.MenuItem.new_with_mnemonic(name)
-            item.connect("activate", self._do_send_key, combo)
-
-            menu.add(item)
+            self._make_keycombo_item(name, combo, menu)
 
         make_item("Ctrl+Alt+_Backspace", ["Control_L", "Alt_L", "BackSpace"])
         make_item("Ctrl+Alt+_Delete", ["Control_L", "Alt_L", "Delete"])
@@ -223,6 +259,11 @@ class vmmConsolePages(vmmGObjectUI):
             make_item("Ctrl+Alt+F_%d" % i, ["Control_L", "Alt_L", "F%d" % i])
         menu.add(Gtk.SeparatorMenuItem())
 
+        item = Gtk.MenuItem.new_with_mnemonic("Alt+SysRq")
+        item.set_submenu(self._build_sysrq_menu())
+        menu.add(item)
+
+        menu.add(Gtk.SeparatorMenuItem())
         make_item("_Printscreen", ["Print"])
 
         menu.show_all()
