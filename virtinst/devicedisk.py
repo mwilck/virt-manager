@@ -552,7 +552,8 @@ class VirtualDisk(VirtualDevice):
         # Recommended xen defaults from here:
         # https://bugzilla.redhat.com/show_bug.cgi?id=1171550#c9
         # If type block, use name=phy. Otherwise do the same as qemu
-        if self.conn.is_xen() and self.type == self.TYPE_BLOCK:
+        if self.conn.is_xen() and self.type == self.TYPE_BLOCK and not \
+           self.is_cdrom():
             return self.DRIVER_NAME_PHY
         if self.conn.check_support(
                 self.conn.SUPPORT_CONN_DISK_DRIVER_NAME_QEMU):
