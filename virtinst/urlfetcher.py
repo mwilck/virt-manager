@@ -392,7 +392,23 @@ def _distroFromSUSEContent(fetcher, arch, vmtype=None):
     try:
         cbuf = fetcher.acquireFileContent("content")
     except ValueError:
-        return None
+        try:
+            # If no content file, try media.1/products and media.1/build and create
+            # a cbuf with enough info for the content file parsing code below to work
+            pbuf = fetcher.acquireFileContent("media.1/products").strip()
+            pbuf = pbuf.split(' ', 1)[1].strip()
+            # The media.1/products file naming convention changed between SLE11 and SLE12
+            if pbuf.startswith('SLE'):
+                pbuf = pbuf.split(' ')[0]
+                pbuf = " ".join(re.split('(\d+)', pbuf, 1))
+            cbuf = "\nDISTRO ," + pbuf.replace('-', ' ')
+            try:
+                bbuf = fetcher.acquireFileContent("media.1/build").split('-')
+            except:
+                bbuf = ["x86_64"]
+            cbuf = cbuf + "\n" + " ".join(bbuf)
+        except ValueError:
+            return None
 
     distribution = None
     distro_version = None
@@ -465,7 +481,7 @@ def _distroFromSUSEContent(fetcher, arch, vmtype=None):
     dclass = GenericDistro
     if distribution:
         if re.match(".*SUSE Linux Enterprise Server*", distribution[1]) or \
-                re.match(".*SUSE SLES*", distribution[1]):
+           re.match(".*SUSE SLES*", distribution[1]) or re.match("SLES*", distribution[1]):
             dclass = SLESDistro
             if distro_version is None:
                 distro_version = _parse_sle_distribution(distribution)
@@ -481,7 +497,7 @@ def _distroFromSUSEContent(fetcher, arch, vmtype=None):
             dclass = CAASPDistro
             if distro_version is None:
                 distro_version = ['VERSION', distribution[1].strip().rsplit(' ')[6]]
-        elif re.match(".*openSUSE.*", distribution[1]):
+        elif re.match(".*openSUSE.*", distribution[1]) or re.match("openSUSE *", distribution[1]):
             dclass = OpensuseDistro
             if distro_version is None:
                 distro_version = ['VERSION', distribution[0].strip().rsplit(':')[4]]
@@ -1003,6 +1019,7 @@ class SLDistro(RHELDistro):
 
 class SuseDistro(Distro):
     name = "SUSE"
+    uses_treeinfo = True
 
     _boot_iso_paths   = ["boot/boot.iso"]
 
@@ -1040,8 +1057,11 @@ class SuseDistro(Distro):
                 self._xen_kernel_paths = [("boot/%s/vmlinuz-xenpae" % self.arch,
                                             "boot/%s/initrd-xenpae" % self.arch)]
             else:
-                self._xen_kernel_paths = [("boot/%s/vmlinuz-xen" % self.arch,
-                                            "boot/%s/initrd-xen" % self.arch)]
+                self._xen_kernel_paths = [("boot/%s/loader/linux" % self.arch,
+                                                  "boot/%s/loader/initrd" % self.arch)]
+                # By appending this gets searched for first
+                self._xen_kernel_paths.append(("boot/%s/vmlinuz-xen" % self.arch,
+                                            "boot/%s/initrd-xen" % self.arch))
 
     def _variantFromVersion(self):
         distro_version = self.version_from_content[1].strip()
@@ -1053,7 +1073,7 @@ class SuseDistro(Distro):
             if len(distro_version.split('.', 1)) == 2:
                 sp_version = 'sp' + distro_version.split('.', 1)[1].strip()
             self.os_variant += version
-            if sp_version:
+            if sp_version and sp_version != 'sp0':
                 self.os_variant += sp_version
         elif self.os_variant.startswith("opensuse"):
             if len(version) == 8:
@@ -1077,6 +1097,24 @@ class SuseDistro(Distro):
             self.os_variant += "9"
 
     def isValidStore(self):
+        if self.treeinfo:
+            ret = False
+            if self.urldistro:
+                family = self.treeinfo.get("general", "family")
+                if "SUSE Linux Enterprise Server" in family and 'sles' in self.urldistro or \
+                   "SUSE Linux Enterprise Desktop" in family and 'sled' in self.urldistro or \
+                   "SUSE Linux Enterprise" in family and 'sles' in self.urldistro or \
+                   "SUSE Containers" in family and 'caasp' in self.urldistro or \
+                   "openSUSE" in family and 'opensuse' in self.urldistro or \
+                   "Open Enterprise" in family and 'oes' in self.urldistro:
+                    ret = True
+            if ret:
+                version = self.treeinfo.get("general", "version")
+                distro_version = ['VERSION', version]
+                self.version_from_content = distro_version
+                self._variantFromVersion()
+            return ret
+
         # self.version_from_content is the VERSION line from the contents file
         if (not self.version_from_content or
             self.version_from_content[1] is None):
@@ -1128,8 +1166,6 @@ class OESDistro(SuseDistro):
     urldistro = "oes"
 
 
-# Suse  image store is harder - we fetch the kernel RPM and a helper
-# RPM and then munge bits together to generate a initrd
 class OpensuseDistro(SuseDistro):
     urldistro = "opensuse"
 
