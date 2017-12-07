@@ -466,6 +466,10 @@ def _distroFromSUSEContent(fetcher, arch, vmtype=None):
             dclass = OESDistro
             if distro_version is None:
                 distro_version = _parse_sle_distribution(distribution)
+        elif re.match(".*SUSE Container as a Service Platform*", distribution[1]):
+            dclass = CAASPDistro
+            if distro_version is None:
+                distro_version = ['VERSION', distribution[1].strip().rsplit(' ')[6]]
         elif re.match(".*openSUSE.*", distribution[1]):
             dclass = OpensuseDistro
             if distro_version is None:
@@ -1052,6 +1056,8 @@ class SuseDistro(Distro):
                 self.os_variant += major_version + 'sp' + sp_version
             else:
                 self.os_variant += major_version
+        elif self.os_variant.startswith("caasp"):
+            self.os_variant = "caasp" + distro_version
         else:
             self.os_variant += "9"
 
@@ -1097,6 +1103,11 @@ class SLESDistro(SuseDistro):
 
 class SLEDDistro(SuseDistro):
     urldistro = "sled"
+
+
+class CAASPDistro(SuseDistro):
+    urldistro = "caasp"
+
 
 class OESDistro(SuseDistro):
     urldistro = "oes"
