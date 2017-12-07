@@ -133,6 +133,19 @@ def fetch_pools(backend, origmap, build_func):
 
     if backend.check_support(
             backend.SUPPORT_CONN_LISTALLSTORAGEPOOLS) and not FORCE_OLD_POLL:
+
+        # Refresh pools before poll_helper. For those
+        # 'active' but target path not exist (or other reasons
+        # causing the pool not working), but libvirtd not
+        # refresh the status, this will make it refreshed
+        # and mark that pool as 'inactive'.
+        objs = backend.listAllStoragePools()
+        for obj in objs:
+            try:
+                obj.refresh(0)
+            except Exception, e:
+                pass
+
         return _new_poll_helper(origmap, name,
                                 backend.listAllStoragePools, build_func)
     else:
