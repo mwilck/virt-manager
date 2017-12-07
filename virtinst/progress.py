@@ -79,7 +79,7 @@ class TerminalLine:
             a number of different elements (default=2). """
         if self._llen < fixed:
             return 0
-        return (self._llen - fixed) / elements
+        return int((self._llen - fixed) / elements)
 
     def add(self, element, full_len=None):
         """ If there is room left in the line, above min_len, add element.
