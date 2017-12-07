@@ -362,6 +362,17 @@ class Guest(XMLBuilder):
 
         self._set_osxml_defaults()
 
+        # At install time set the target disk to 'unsafe' for
+        # better performance if the target is not a block device
+        saved_cache = "None"
+        if install:
+            disk_devices = self.get_devices("disk")
+            if disk_devices:
+                target_disk = self.get_devices("disk")[0]
+                saved_cache = target_disk.driver_cache
+                if target_disk.type != VirtualDisk.TYPE_BLOCK:
+                    target_disk.driver_cache = VirtualDisk.CACHE_MODE_UNSAFE
+
         self.bootloader = None
         if (not install and
             self.os.is_xenpv() and
@@ -381,7 +392,10 @@ class Guest(XMLBuilder):
                 self.installer.alter_bootconfig(self, True, True)
                 logging.info("Using grub.xen to boot guest")
 
-        return self.get_xml_config()
+        xml_config = self.get_xml_config()
+        if install and saved_cache != "None":
+            target_disk.driver_cache = saved_cache
+        return xml_config
 
 
     ###########################
