@@ -218,6 +218,16 @@ class vmmConsolePages(vmmGObjectUI):
         make_item("Ctrl+Alt+_Backspace", ["Control_L", "Alt_L", "BackSpace"])
         make_item("Ctrl+Alt+_Delete", ["Control_L", "Alt_L", "Delete"])
         menu.add(Gtk.SeparatorMenuItem())
+        make_item("Ctrl+Scroll+Scroll", ["Control_L", "Scroll" + "Scroll"])
+        make_item("Alt+F_10", ["Alt_L", "F10"])
+        make_item("Alt+Tab", ["Alt_L", "Tab"])
+        make_item("Alt+Escape", ["Alt_L", "Escape"])
+        make_item("Ctrl+Escape", ["Control_L", "Escape"])
+        make_item("Ctrl+Alt+Escape", ["Control_L", "Alt_L", "Escape"])
+        make_item("Alt+Shift+Shift+Escape", ["Alt_R", "Shift_R", "Shift_L", "Escape"])
+        make_item("F_8", ["F8"])
+        make_item("F_10", ["F10"])
+        menu.add(Gtk.SeparatorMenuItem())
 
         for i in range(1, 13):
             make_item("Ctrl+Alt+F_%d" % i, ["Control_L", "Alt_L", "F%d" % i])
