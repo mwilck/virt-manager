@@ -440,6 +440,10 @@ def _distroFromSUSEContent(fetcher, arch, vmtype=None):
             arch = "i586"
         elif cbuf.find("s390x") != -1:
             arch = "s390x"
+        elif cbuf.find("ppc64") != -1:
+            arch = "ppc64"
+        elif cbuf.find("ppc64le") != -1:
+            arch = "ppc64le"
 
     def _parse_sle_distribution(d):
         sle_version = d[1].strip().rsplit(' ')[4]
@@ -998,10 +1002,12 @@ class SuseDistro(Distro):
             oldkern += "64"
             oldinit += "64"
 
-        if self.arch == "s390x":
+        if self.arch == "s390x" or \
+           self.arch == "ppc64" or self.arch == "ppc64le":
+
             self._hvm_kernel_paths = [("boot/%s/linux" % self.arch,
                                        "boot/%s/initrd" % self.arch)]
-            # No Xen on s390x
+            # No Xen on s390x or ppc64
             self._xen_kernel_paths = []
         else:
             # Tested with Opensuse >= 10.2, 11, and sles 10
