@@ -83,7 +83,8 @@ class _CLIConfig(object):
             _get_param("preferred_distros", ""))
         self.hv_packages = _split_list(_get_param("hv_packages", ""))
         self.askpass_package = _split_list(_get_param("askpass_packages", ""))
-        self.libvirt_packages = _split_list(_get_param("libvirt_packages", ""))
+        self.libvirt_kvm_packages = _split_list(_get_param("libvirt_kvm_packages", ""))
+        self.libvirt_xen_packages = _split_list(_get_param("libvirt_xen_packages", ""))
         self.default_graphics = _get_param("default_graphics", "spice")
         self.default_hvs = _split_list(_get_param("default_hvs", ""))
 

@@ -172,7 +172,8 @@ class vmmConfig(object):
         self.default_qemu_user = CLIConfig.default_qemu_user
         self.preferred_distros = CLIConfig.preferred_distros
         self.hv_packages = CLIConfig.hv_packages
-        self.libvirt_packages = CLIConfig.libvirt_packages
+        self.libvirt_kvm_packages = CLIConfig.libvirt_kvm_packages
+        self.libvirt_xen_packages = CLIConfig.libvirt_xen_packages
         self.askpass_package = CLIConfig.askpass_package
         self.default_graphics_from_config = CLIConfig.default_graphics
         self.default_hvs = CLIConfig.default_hvs

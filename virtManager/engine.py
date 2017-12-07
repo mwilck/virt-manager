@@ -226,22 +226,18 @@ class vmmEngine(vmmGObject):
 
         ret = None
         try:
-            libvirt_packages = self.config.libvirt_packages
-            packages = self.config.hv_packages + libvirt_packages
+            tryuri = vmmConnect.default_uri()
+            if tryuri and tryuri.startswith('xen'):
+                packages = self.config.libvirt_xen_packages
+            else:
+                packages = self.config.libvirt_kvm_packages + self.config.hv_packages
 
             ret = packageutils.check_packagekit(manager, manager.err, packages)
         except Exception:
             logging.exception("Error talking to PackageKit")
 
-        tryuri = None
-        if ret:
-            tryuri = "qemu:///system"
-        elif not self.config.test_first_run:
-            tryuri = vmmConnect.default_uri()
-
         if tryuri is None:
-            manager.set_startup_error(msg)
-            return
+            tryuri = "qemu:///system"
 
         warnmsg = _("The 'libvirtd' service will need to be started.\n\n"
                     "After that, virt-manager will connect to libvirt on\n"

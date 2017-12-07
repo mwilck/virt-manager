@@ -308,8 +308,11 @@ class configure(distutils.core.Command):
         ("prefix=", None, "installation prefix"),
         ("qemu-user=", None,
          "user libvirt uses to launch qemu processes (default=root)"),
-        ("libvirt-package-names=", None,
-         "list of libvirt distro packages virt-manager will check for on "
+        ("libvirt-kvm-package-names=", None,
+         "list of libvirt kvm distro packages virt-manager will check for on "
+         "first run. comma separated string (default=none)"),
+        ("libvirt-xen-package-names=", None,
+         "list of libvirt xen distro packages virt-manager will check for on "
          "first run. comma separated string (default=none)"),
         ("kvm-package-names=", None,
          "recommended kvm packages virt-manager will check for on first run "
@@ -335,7 +338,8 @@ class configure(distutils.core.Command):
     def initialize_options(self):
         self.prefix = sysprefix
         self.qemu_user = None
-        self.libvirt_package_names = None
+        self.libvirt_kvm_package_names = None
+        self.libvirt_xen_package_names = None
         self.kvm_package_names = None
         self.askpass_package_names = None
         self.preferred_distros = None
@@ -350,8 +354,10 @@ class configure(distutils.core.Command):
         template += "prefix = %s\n" % self.prefix
         if self.qemu_user is not None:
             template += "default_qemu_user = %s\n" % self.qemu_user
-        if self.libvirt_package_names is not None:
-            template += "libvirt_packages = %s\n" % self.libvirt_package_names
+        if self.libvirt_kvm_package_names is not None:
+            template += "libvirt_kvm_packages = %s\n" % self.libvirt_kvm_package_names
+        if self.libvirt_xen_package_names is not None:
+            template += "libvirt_xen_packages = %s\n" % self.libvirt_xen_package_names
         if self.kvm_package_names is not None:
             template += "hv_packages = %s\n" % self.kvm_package_names
         if self.askpass_package_names is not None:
