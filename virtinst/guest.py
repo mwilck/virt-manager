@@ -805,7 +805,8 @@ class Guest(XMLBuilder):
             # install.
             if (dev.is_cdrom() and
                 getattr(dev, "installer_media", False) and
-                not self._os_object.is_windows()):
+                not self._os_object.is_windows() and
+                not self.os_variant.startswith(("sles", "sled", "opensuse"))):
                 dev.path = None
 
     def _set_defaults(self):
