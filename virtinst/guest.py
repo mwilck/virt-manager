@@ -366,8 +366,20 @@ class Guest(XMLBuilder):
         if (not install and
             self.os.is_xenpv() and
             not self.os.kernel):
-            self.bootloader = "/usr/bin/pygrub"
-            self.os.clear()
+            os_ver = self._get_os_variant()
+            if self.os.arch != 'x86_64' or os_ver.startswith("sles9") or \
+               os_ver.startswith("sles10") or os_ver.startswith("sled10") or \
+               os_ver.startswith("opensuse10") or os_ver.startswith("opensuse11"):
+                self.bootloader = "pygrub"
+                self.os.clear()
+            else:
+                self.installer._install_kernel = "/usr/lib/grub2/x86_64-xen/grub.xen"
+                self.installer._install_initrd = None
+                self.installer.extraargs = None
+                # alter_bootconfig won't update the osxml unless it thinks
+                # we are in an install phase. Add force_update param to call
+                self.installer.alter_bootconfig(self, True, True)
+                logging.info("Using grub.xen to boot guest")
 
         return self.get_xml_config()
 

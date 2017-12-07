@@ -99,7 +99,7 @@ class Installer(object):
                 break
         return bootorder
 
-    def alter_bootconfig(self, guest, isinstall):
+    def alter_bootconfig(self, guest, isinstall, force_update=False):
         """
         Generate the portion of the guest xml that determines boot devices
         and parameters. (typically the <os></os> block)
@@ -110,7 +110,7 @@ class Installer(object):
                           'post-install' phase.
         @type isinstall: C{bool}
         """
-        if isinstall and not self.has_install_phase():
+        if isinstall and not force_update and not self.has_install_phase():
             return
 
         bootorder = guest.os.bootorder
