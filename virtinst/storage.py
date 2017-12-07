@@ -708,6 +708,12 @@ class StorageVolume(_StorageObject):
         return self._pool_xml.get_disk_type()
     file_type = property(_get_vol_type)
 
+    def _nocow_default_cb(self):
+        return self.conn.check_support(
+            self.conn.SUPPORT_CONN_NOCOW)
+    nocow = XMLProperty("./target/nocow",
+        is_bool=True, default_cb=_nocow_default_cb)
+
 
     ##################
     # XML properties #
