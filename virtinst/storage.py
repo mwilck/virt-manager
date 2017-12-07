@@ -467,7 +467,7 @@ class StoragePool(_StorageObject):
     def list_formats(self):
         if self.type == self.TYPE_FS:
             return ["auto", "ext2", "ext3", "ext4", "ufs", "iso9660", "udf",
-                    "gfs", "gfs2", "vfat", "hfs+", "xfs"]
+                    "gfs", "gfs2", "vfat", "hfs+", "xfs", "ocfs2"]
         if self.type == self.TYPE_NETFS:
             return ["auto", "nfs", "glusterfs"]
         if self.type == self.TYPE_DISK:
