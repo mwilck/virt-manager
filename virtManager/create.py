@@ -24,6 +24,9 @@ import pkgutil
 import os
 import threading
 import time
+import sys
+import os
+import re
 
 from gi.repository import GObject
 from gi.repository import Gtk
@@ -1505,6 +1508,63 @@ class vmmCreate(vmmGObjectUI):
     def _cdrom_changed(self, src):
         self._detectable_media_widget_changed(src)
 
+    def _lookup_host_os(self):
+        def _lookup_sp(line):
+            sp = ""
+            m = re.search(' SP[1234] ', line)
+            if m:
+                sp = m.group(0).strip().lower()
+            return sp
+        if sys.platform == 'linux2':
+            if os.path.exists('/etc/issue'):
+                f = open('/etc/issue')
+                lines = f.readlines()
+                f.close()
+                for line in lines:
+                    if "openSUSE " in line:
+                        parts = line.split(' ')
+                        if len(parts) > 2 and len(parts[3]) <= 4:
+                            os_ver = "opensuse" + parts[3]
+                            return 'linux', os_ver
+                        return 'linux', 'opensuse42.2'
+                    if "SUSE Linux Enterprise Server 15" in line:
+                        return 'linux', ('sles15' + _lookup_sp(line))
+                    if "SUSE Linux Enterprise Server 12" in line:
+                        return 'linux', ('sles12' + _lookup_sp(line))
+                    if "SUSE Linux Enterprise Server 11" in line:
+                        return 'linux', ('sles11' + _lookup_sp(line))
+                    if "SUSE Linux Enterprise Desktop 15" in line:
+                        return 'linux', ('sled15' + _lookup_sp(line))
+                    if "SUSE Linux Enterprise Desktop 12" in line:
+                        return 'linux', ('sled12' + _lookup_sp(line))
+                    if "SUSE Linux Enterprise Desktop 11" in line:
+                        return 'linux', ('sled11' + _lookup_sp(line))
+        return None, None
+
+    def detect_host_os(self):
+        box = self.widget('install-os-type')
+        if box.get_active() <= 0:
+            os_type, os_variant = self._lookup_host_os()
+            if os_type is None:
+                return
+            model = box.get_model()
+            index = 0
+            for row in model:
+                if row[0] == 'linux':
+                    box.set_active(index)
+                    break
+                index += 1
+            if os_variant is None:
+                return
+            box = self.widget('install-os-version')
+            model = box.get_model()
+            index = 0
+            for row in model:
+                if row[0] == os_variant:
+                    box.set_active(index)
+                    break
+                index += 1
+
     def _toggle_detect_os(self, src):
         dodetect = src.get_active()
 
@@ -1517,6 +1577,8 @@ class vmmCreate(vmmGObjectUI):
             self.widget("install-os-version-entry").set_text("")
             self._os_already_detected_for_media = False
             self._start_detect_os_if_needed()
+        else:
+            self.detect_host_os()
 
     def _selected_os_row(self):
         return uiutil.get_list_selected_row(self.widget("install-os-type"))
