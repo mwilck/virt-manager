@@ -424,7 +424,13 @@ class vmmCreate(vmmGObjectUI):
         self.widget("install-url-entry").set_text("")
         self.widget("install-url-options").set_expanded(False)
         urlmodel = self.widget("install-url-combo").get_model()
-        _populate_media_model(urlmodel, self.config.get_media_urls())
+        urllist = self.config.get_media_urls()
+        (index, inst_repos) = util.getInstallRepos()
+        for u in urllist:
+            if u in inst_repos:
+                inst_repos.remove(u)
+        media_urllist = urllist + inst_repos
+        _populate_media_model(urlmodel, media_urllist)
         self._set_distro_labels("-", "-")
 
         # Install import

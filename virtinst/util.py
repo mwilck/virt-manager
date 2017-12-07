@@ -23,9 +23,12 @@ import os
 import random
 import re
 import sys
+import subprocess
+from subprocess import Popen, PIPE
 
 import libvirt
 
+_host_repo_url = None
 
 def listify(l):
     if l is None:
@@ -317,3 +320,104 @@ def make_meter(quiet):
     if quiet:
         return progress.BaseMeter()
     return progress.TextMeter(fo=sys.stdout)
+
+def getHostInstallSource():
+    global _host_repo_url
+    if _host_repo_url is not None:
+        return _host_repo_url
+    if os.geteuid() != 0:
+        return None
+
+    if os.path.exists('/var/lib/YaST2/install.inf'):
+        server_ip = server_name = server_dir = inst_mode = None
+        f = open('/var/lib/YaST2/install.inf')
+        lines = f.readlines()
+        f.close()
+        # Newer install.inf files use RepoURL.  Older versions require parsing more fields
+        for line in lines:
+            if line.startswith('RepoURL:'):
+                repo_url = line[:-1].split('?', 1)[0]
+                repo_url = repo_url.split(' ')
+                if len(repo_url) > 1:
+                    if repo_url[1].startswith('ftp:') or repo_url[1].startswith('http:') or \
+                       repo_url[1].startswith('smb:') or repo_url[1].startswith('nfs:'):
+                        _host_repo_url = repo_url[1]
+                        return repo_url[1]
+                return None
+            elif line.startswith('InstMode:'):
+                inst_mode = line[:-1].split('?', 1)[0]
+                inst_mode = inst_mode.split(' ')
+                inst_mode = inst_mode[1]
+                if inst_mode != 'ftp' and inst_mode != 'http' and inst_mode != 'smb' and inst_mode != 'nfs':
+                    return None
+            elif line.startswith('ServerIP:'):
+                server_ip = line[:-1].split('?', 1)[0]
+                server_ip = server_ip.split(' ')
+                server_ip = server_ip[1]
+            elif line.startswith('ServerName:'):
+                server_name = line[:-1].split('?', 1)[0]
+                server_name = server_name.split(' ')
+                server_name = server_name[1]
+            elif line.startswith('Serverdir:'):
+                server_dir = line[:-1].split('?', 1)[0]
+                server_dir = server_dir.split(' ')
+                server_dir = server_dir[1]
+        if inst_mode:
+            repo_url = inst_mode + "://"
+            if server_name:
+                repo_url = repo_url + server_name + "/"
+                if server_dir:
+                    repo_url = repo_url + server_dir
+            elif server_ip:
+                repo_url = repo_url + server_ip + "/"
+                if server_dir:
+                    repo_url = repo_url + server_dir
+            _host_repo_url = repo_url
+            return repo_url
+    else:
+        (_,zypper_output) = lookupZypperRepos()
+        if len(zypper_output):
+            _host_repo_url = zypper_output[0]
+            return _host_repo_url
+    return None
+
+def lookupZypperRepos(dom0_inst_source=None):
+    try:
+        env = os.environ.copy()
+        env['LC_ALL'] = 'C'
+        cmd = ['/usr/bin/zypper', 'lr', '-u', '-P', '-E']
+        p = subprocess.Popen(cmd, stdout=PIPE, stderr=PIPE, env=env)
+        stdout, stderr = p.communicate()
+        zypper_output = stdout
+        zypper_list = zypper_output.split("\n")
+        zypper_header = [x.strip(' ') for x in zypper_list[0].split("|")]
+        uri_index = zypper_header.index("URI")
+    except:
+        inst_source = []
+        if dom0_inst_source:
+            inst_source = [dom0_inst_source]
+        return (0, inst_source)
+
+    index_dom0 = -1
+    number_of_sources = 0
+    zypper_output = []
+    for repo in zypper_list:
+        repo = [x.strip(' ') for x in repo.split("|")]
+        if len(repo) >= uri_index:
+            str = repo[uri_index]
+            if str.startswith('ftp://') or str.startswith('http://') or str.startswith('nfs://') or str.startswith('smb://'):
+                zypper_output.append(str)
+                if dom0_inst_source is not None and str == dom0_inst_source:
+                    index_dom0 = number_of_sources
+                number_of_sources += 1
+
+    if index_dom0 == -1 and dom0_inst_source:
+        index_dom0 = 0
+        zypper_output.insert(0, dom0_inst_source)
+    return (index_dom0, zypper_output)
+
+def getInstallRepos():
+    if os.geteuid() != 0:
+        return (0, [])
+    return lookupZypperRepos(getHostInstallSource())
+
