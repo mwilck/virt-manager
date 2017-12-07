@@ -35,7 +35,7 @@ from .viewers import SpiceViewer, VNCViewer, have_spice_gtk
 (_CONSOLE_PAGE_UNAVAILABLE,
  _CONSOLE_PAGE_AUTHENTICATE,
  _CONSOLE_PAGE_SERIAL,
- _CONSOLE_PAGE_VIEWER) = range(4)
+ _CONSOLE_PAGE_VIEWER) = list(range(4))
 
 
 class _TimedRevealer(vmmGObject):

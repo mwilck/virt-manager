@@ -162,7 +162,7 @@ class vmmAddStorage(vmmGObjectUI):
         errmsg = _("Errors were encountered changing permissions for the "
                    "following directories:")
         details = ""
-        for p, error in errors.items():
+        for p, error in list(errors.items()):
             if p not in broken_paths:
                 continue
             details += "%s : %s\n" % (p, error)
@@ -174,7 +174,7 @@ class vmmAddStorage(vmmGObjectUI):
                              _("Don't ask about these directories again."))
 
         if chkres:
-            src.config.add_perms_fix_ignore(errors.keys())
+            src.config.add_perms_fix_ignore(list(errors.keys()))
 
     def reset_state(self):
         self._update_host_space()

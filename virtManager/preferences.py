@@ -121,7 +121,7 @@ class vmmPreferences(vmmGObjectUI):
         }
         model.append([-1, _("System default (%s)") %
             vals[self.config.default_console_resizeguest]])
-        for key, val in vals.items():
+        for key, val in list(vals.items()):
             model.append([key, val])
         combo.set_model(model)
         uiutil.init_combo_text_column(combo, 1)

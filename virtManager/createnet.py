@@ -35,7 +35,7 @@ from .baseclass import vmmGObjectUI
 (PAGE_NAME,
 PAGE_IPV4,
 PAGE_IPV6,
-PAGE_MISC) = range(4)
+PAGE_MISC) = list(range(4))
 
 PAGE_MAX = PAGE_MISC
 

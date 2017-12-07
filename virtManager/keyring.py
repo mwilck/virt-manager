@@ -110,10 +110,10 @@ class vmmKeyring(object):
             label = iface.get_cached_property("Label").unpack().strip("'")
             dbusattrs = iface.get_cached_property("Attributes").unpack()
 
-            secret = u"".join([unichr(c) for c in secretbytes])
+            secret = "".join([chr(c) for c in secretbytes])
 
             attrs = {}
-            for key, val in dbusattrs.items():
+            for key, val in list(dbusattrs.items()):
                 if key not in ["hvuri", "uuid"]:
                     continue
                 attrs["%s" % key] = "%s" % val

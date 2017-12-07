@@ -387,7 +387,7 @@ class vmmCreateInterface(vmmGObjectUI):
             Interface.INTERFACE_TYPE_VLAN: "vlan",
         }
 
-        for key, value in type_dict.items():
+        for key, value in list(type_dict.items()):
             do_show = (key == itype)
             self.widget("%s-label" % value).set_visible(do_show)
             self.widget("%s-box" % value).set_visible(do_show)
@@ -544,7 +544,7 @@ class vmmCreateInterface(vmmGObjectUI):
                        active, None, iface.get_mac()]
             row_dict[name] = row
 
-        for name, row in nodedevs.items():
+        for name, row in list(nodedevs.items()):
             try:
                 key = Interface(self.conn.get_backend())
                 key.type = Interface.INTERFACE_TYPE_ETHERNET
@@ -556,12 +556,12 @@ class vmmCreateInterface(vmmGObjectUI):
             row[INTERFACE_ROW_KEY] = key
             row_dict[name] = row
 
-        for row in row_dict.values():
+        for row in list(row_dict.values()):
             name = row[INTERFACE_ROW_NAME]
             row[INTERFACE_ROW_IN_USE_BY] = self.iface_in_use_by(self.conn,
                                                                 name)
 
-        for row in row_dict.values():
+        for row in list(row_dict.values()):
             model.append(row)
 
     def get_default_name(self):

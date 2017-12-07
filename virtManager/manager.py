@@ -48,7 +48,7 @@ ROW_IS_CONN_CONNECTED,
 ROW_IS_VM,
 ROW_IS_VM_RUNNING,
 ROW_COLOR,
-ROW_INSPECTION_OS_ICON) = range(11)
+ROW_INSPECTION_OS_ICON) = list(range(11))
 
 # Columns in the tree view
 (COL_NAME,
@@ -56,7 +56,7 @@ COL_GUEST_CPU,
 COL_HOST_CPU,
 COL_MEM,
 COL_DISK,
-COL_NETWORK) = range(6)
+COL_NETWORK) = list(range(6))
 
 
 def _style_get_prop(widget, propname):

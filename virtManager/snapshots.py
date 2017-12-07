@@ -44,7 +44,7 @@ mimemap = {
 
 
 def _mime_to_ext(val, reverse=False):
-    for m, e in mimemap.items():
+    for m, e in list(mimemap.items()):
         if val == m and not reverse:
             return e
         if val == e and reverse:
@@ -507,7 +507,7 @@ class vmmSnapshotPage(vmmGObjectUI):
             basesn = os.path.join(cachedir, "snap-screenshot-%s" % name)
 
             # Remove any pre-existing screenshots so we don't show stale data
-            for ext in mimemap.values():
+            for ext in list(mimemap.values()):
                 p = basesn + "." + ext
                 if os.path.exists(basesn + "." + ext):
                     os.unlink(p)

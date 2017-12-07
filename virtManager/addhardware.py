@@ -57,7 +57,7 @@ from .addstorage import vmmAddStorage
  PAGE_USBREDIR,
  PAGE_TPM,
  PAGE_RNG,
- PAGE_PANIC) = range(0, 17)
+ PAGE_PANIC) = list(range(0, 17))
 
 
 class vmmAddHardware(vmmGObjectUI):
@@ -1160,7 +1160,7 @@ class vmmAddHardware(vmmGObjectUI):
         self._dev = VirtualTPMDevice(self.conn.get_backend())
         self._dev.type = devtype
 
-        for param_name, widget_name in tpm_widget_mappings.items():
+        for param_name, widget_name in list(tpm_widget_mappings.items()):
             make_visible = self._dev.supports_property(param_name)
             uiutil.set_grid_row_visible(self.widget(widget_name + "-label"),
                                            make_visible)
@@ -1214,7 +1214,7 @@ class vmmAddHardware(vmmGObjectUI):
         self._dev = char_class(self.conn.get_backend())
         self._dev.type = devtype
 
-        for param_name, widget_name in char_widget_mappings.items():
+        for param_name, widget_name in list(char_widget_mappings.items()):
             make_visible = self._dev.supports_property(param_name)
             uiutil.set_grid_row_visible(self.widget(widget_name + "-label"),
                                            make_visible)
@@ -1669,7 +1669,7 @@ class vmmAddHardware(vmmGObjectUI):
         try:
             self._dev = devclass
 
-            for param_name, val in value_mappings.items():
+            for param_name, val in list(value_mappings.items()):
                 if self._dev.supports_property(param_name) and val is not None:
                     setattr(self._dev, param_name, val)
 
@@ -1750,7 +1750,7 @@ class vmmAddHardware(vmmGObjectUI):
         try:
             self._dev = VirtualTPMDevice(conn)
             self._dev.type = typ
-            for param_name, val in value_mappings.items():
+            for param_name, val in list(value_mappings.items()):
                 if self._dev.supports_property(param_name):
                     setattr(self._dev, param_name, val)
         except Exception as e:
@@ -1854,7 +1854,7 @@ class vmmAddHardware(vmmGObjectUI):
         try:
             self._dev = virtinst.VirtualRNGDevice(self.conn.get_backend())
             self._dev.type = rtype
-            for param_name, val in value_mappings.items():
+            for param_name, val in list(value_mappings.items()):
                 if self._dev.supports_property(param_name):
                     setattr(self._dev, param_name, val)
         except Exception as e:

@@ -25,8 +25,8 @@ from gi.repository import Gtk
 
 def rect_print(name, rect):
     # For debugging
-    print("%s: height=%d, width=%d, x=%d, y=%d" %
-          (name, rect.height, rect.width, rect.x, rect.y))
+    print(("%s: height=%d, width=%d, x=%d, y=%d" %
+          (name, rect.height, rect.width, rect.x, rect.y)))
 
 
 def _line_helper(cairo_ct, x, y, w, h, points, for_fill=False):
@@ -316,7 +316,7 @@ class Sparkline(Gtk.DrawingArea):
         w = window.get_width()
         h = window.get_height()
 
-        points_per_set = (len(self.data_array) / self.num_sets)
+        points_per_set = (len(self.data_array) // self.num_sets)
         pixels_per_point = (float(w) /
                             (float((points_per_set - 1) or 1)))
 

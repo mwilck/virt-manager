@@ -36,7 +36,7 @@ from .domain import vmmDomain
 NUM_COLS = 3
 (COL_LABEL,
  COL_URI,
- COL_CAN_MIGRATE) = range(NUM_COLS)
+ COL_CAN_MIGRATE) = list(range(NUM_COLS))
 
 
 class vmmMigrateDialog(vmmGObjectUI):
@@ -310,7 +310,7 @@ class vmmMigrateDialog(vmmGObjectUI):
         model.clear()
 
         rows = []
-        for conn in self._conns.values():
+        for conn in list(self._conns.values()):
             rows.append(self._build_dest_row(conn))
 
         if not any([row[COL_CAN_MIGRATE] for row in rows]):

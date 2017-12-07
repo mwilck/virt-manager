@@ -103,7 +103,7 @@ class vmmNetwork(vmmLibvirtObject):
     def set_qos(self, **kwargs):
         xmlobj = self._make_xmlobj_to_define()
         q = xmlobj.bandwidth
-        for key, val in kwargs.items():
+        for key, val in list(kwargs.items()):
             setattr(q, key, val)
 
         self._redefine_xmlobj(xmlobj)

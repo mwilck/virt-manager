@@ -33,7 +33,7 @@ class vmmMediaCombo(vmmGObjectUI):
     (OPTICAL_DEV_PATH,
     OPTICAL_LABEL,
     OPTICAL_HAS_MEDIA,
-    OPTICAL_DEV_KEY) = range(OPTICAL_FIELDS)
+    OPTICAL_DEV_KEY) = list(range(OPTICAL_FIELDS))
 
     def __init__(self, conn, builder, topwin, media_type):
         vmmGObjectUI.__init__(self, None, None, builder=builder, topwin=topwin)

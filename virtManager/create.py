@@ -55,7 +55,7 @@ DEFAULT_MEM = 1024
  PAGE_INSTALL,
  PAGE_MEM,
  PAGE_STORAGE,
- PAGE_FINISH) = range(5)
+ PAGE_FINISH) = list(range(5))
 
 (INSTALL_PAGE_ISO,
  INSTALL_PAGE_URL,
@@ -63,13 +63,13 @@ DEFAULT_MEM = 1024
  INSTALL_PAGE_IMPORT,
  INSTALL_PAGE_CONTAINER_APP,
  INSTALL_PAGE_CONTAINER_OS,
- INSTALL_PAGE_VZ_TEMPLATE) = range(7)
+ INSTALL_PAGE_VZ_TEMPLATE) = list(range(7))
 
 # Column numbers for os type/version list models
 (OS_COL_ID,
  OS_COL_LABEL,
  OS_COL_IS_SEP,
- OS_COL_IS_SHOW_ALL) = range(4)
+ OS_COL_IS_SHOW_ALL) = list(range(4))
 
 
 #####################
@@ -951,7 +951,7 @@ class vmmCreate(vmmGObjectUI):
         model.clear()
 
         default = -1
-        for c in self.engine.conns.values():
+        for c in list(self.engine.conns.values()):
             connobj = c["conn"]
             if not connobj.is_active():
                 continue
@@ -2579,7 +2579,7 @@ class vmmCreate(vmmGObjectUI):
                 'passwd': self._get_config_oscontainer_source_password,
                 'insecure': self._get_config_oscontainer_isecure
             }
-            for key, getter in bootstrap_arg_keys.items():
+            for key, getter in list(bootstrap_arg_keys.items()):
                 bootstrap_args[key] = getter()
 
         parentobj = self._customize_window or self

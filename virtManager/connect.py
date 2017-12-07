@@ -22,7 +22,7 @@ import glob
 import os
 import logging
 import socket
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 from gi.repository import Gio
 from gi.repository import GObject
@@ -36,11 +36,11 @@ HV_XEN,
 HV_LXC,
 HV_QEMU_SESSION,
 HV_BHYVE,
-HV_VZ) = range(6)
+HV_VZ) = list(range(6))
 
 (CONN_SSH,
 CONN_TCP,
-CONN_TLS) = range(3)
+CONN_TLS) = list(range(3))
 
 
 def current_user():
@@ -394,7 +394,7 @@ class vmmConnect(vmmGObjectUI):
 
         addrstr = ""
         if user:
-            addrstr += urllib.quote(user) + "@"
+            addrstr += urllib.parse.quote(user) + "@"
 
         if host.count(":") > 1:
             host = "[%s]" % host
@@ -449,7 +449,7 @@ class vmmConnect(vmmGObjectUI):
         if host.startswith("linux-"):
             tmphost = host[6:]
             try:
-                long(tmphost)
+                int(tmphost)
                 host = ""
             except ValueError:
                 pass

@@ -106,7 +106,7 @@ from .graphwidgets import Sparkline
 
  EDIT_FS,
 
- EDIT_HOSTDEV_ROMBAR) = range(1, 49)
+ EDIT_HOSTDEV_ROMBAR) = list(range(1, 49))
 
 
 # Columns in hw list model
@@ -114,7 +114,7 @@ from .graphwidgets import Sparkline
  HW_LIST_COL_ICON_NAME,
  HW_LIST_COL_ICON_SIZE,
  HW_LIST_COL_TYPE,
- HW_LIST_COL_DEVICE) = range(5)
+ HW_LIST_COL_DEVICE) = list(range(5))
 
 # Types for the hw list model: numbers specify what order they will be listed
 (HW_LIST_TYPE_GENERAL,
@@ -138,7 +138,7 @@ from .graphwidgets import Sparkline
  HW_LIST_TYPE_REDIRDEV,
  HW_LIST_TYPE_TPM,
  HW_LIST_TYPE_RNG,
- HW_LIST_TYPE_PANIC) = range(22)
+ HW_LIST_TYPE_PANIC) = list(range(22))
 
 remove_pages = [HW_LIST_TYPE_NIC, HW_LIST_TYPE_INPUT,
                 HW_LIST_TYPE_GRAPHICS, HW_LIST_TYPE_SOUND, HW_LIST_TYPE_CHAR,
@@ -153,12 +153,12 @@ remove_pages = [HW_LIST_TYPE_NIC, HW_LIST_TYPE_INPUT,
  BOOT_LABEL,
  BOOT_ICON,
  BOOT_ACTIVE,
- BOOT_CAN_SELECT) = range(5)
+ BOOT_CAN_SELECT) = list(range(5))
 
 # Main tab pages
 (DETAILS_PAGE_DETAILS,
  DETAILS_PAGE_CONSOLE,
- DETAILS_PAGE_SNAPSHOTS) = range(3)
+ DETAILS_PAGE_SNAPSHOTS) = list(range(3))
 
 _remove_tooltip = _("Remove this device from the virtual machine")
 
@@ -744,7 +744,7 @@ class vmmDetails(vmmGObjectUI):
         rmHW.connect("activate", self.remove_xml_dev)
 
         self._addhwmenuitems = {"add": addHW, "remove": rmHW}
-        for i in self._addhwmenuitems.values():
+        for i in list(self._addhwmenuitems.values()):
             self.addhwmenu.add(i)
 
         self.widget("hw-panel").set_show_tabs(False)
@@ -1519,7 +1519,7 @@ class vmmDetails(vmmGObjectUI):
             'tEXt::Generator Version': self.config.get_appversion(),
         }
 
-        ret = image.save_to_bufferv('png', metadata.keys(), metadata.values())
+        ret = image.save_to_bufferv('png', list(metadata.keys()), list(metadata.values()))
         # On Fedora 19, ret is (bool, str)
         # Someday the bindings might be fixed to just return the str, try
         # and future proof it a bit
@@ -2835,7 +2835,7 @@ class vmmDetails(vmmGObjectUI):
         set_visible("rng-bind-host", is_egd and (udp or bind))
         set_visible("rng-bind-service", is_egd and (udp or bind))
 
-        for k, prop in values.items():
+        for k, prop in list(values.items()):
             val = "-"
             if dev.supports_property(prop):
                 val = getattr(dev, prop) or "-"
@@ -3214,7 +3214,7 @@ class vmmDetails(vmmGObjectUI):
         for dev in self.vm.get_panic_devices():
             update_hwlist(HW_LIST_TYPE_PANIC, dev)
 
-        devs = range(len(hw_list_model))
+        devs = list(range(len(hw_list_model)))
         devs.reverse()
         for i in devs:
             _iter = hw_list_model.iter_nth_child(None, i)

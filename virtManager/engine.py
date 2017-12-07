@@ -20,7 +20,7 @@
 
 import logging
 import re
-import Queue
+import queue
 import threading
 import traceback
 
@@ -60,7 +60,7 @@ DETAILS_CONFIG = 2
 DETAILS_CONSOLE = 3
 
 (PRIO_HIGH,
- PRIO_LOW) = range(1, 3)
+ PRIO_LOW) = list(range(1, 3))
 
 
 class vmmEngine(vmmGObject):
@@ -104,7 +104,7 @@ class vmmEngine(vmmGObject):
                                             target=self._handle_tick_queue,
                                             args=())
         self._tick_thread.daemon = True
-        self._tick_queue = Queue.PriorityQueue(100)
+        self._tick_queue = queue.PriorityQueue(100)
 
         self.inspection = None
         self._create_inspection_thread()
@@ -153,7 +153,7 @@ class vmmEngine(vmmGObject):
         self._application.add_action(action)
 
     def _default_startup(self, skip_autostart):
-        uris = self.conns.keys()
+        uris = list(self.conns.keys())
         if not uris:
             logging.debug("No stored URIs found.")
         else:
@@ -279,15 +279,15 @@ class vmmEngine(vmmGObject):
         """
         We serialize conn autostart, so polkit/ssh-askpass doesn't spam
         """
-        queue = Queue.Queue()
+        local_queue = queue.Queue()
         auto_conns = [uri for uri in self.conns
                       if self.conns[uri]["conn"].get_autoconnect()]
 
         def add_next_to_queue():
             if not auto_conns:
-                queue.put(None)
+                local_queue.put(None)
             else:
-                queue.put(auto_conns.pop(0))
+                local_queue.put(auto_conns.pop(0))
 
         def state_change_cb(conn):
             if conn.is_active():
@@ -299,7 +299,7 @@ class vmmEngine(vmmGObject):
 
         def handle_queue():
             while True:
-                uri = queue.get()
+                uri = local_queue.get()
                 if uri is None:
                     return
                 if uri not in self.conns:
@@ -336,7 +336,7 @@ class vmmEngine(vmmGObject):
 
         hvuri = conn.get_uri()
 
-        for connkey in self.conns[hvuri]["windowDetails"].keys():
+        for connkey in list(self.conns[hvuri]["windowDetails"].keys()):
             self.conns[hvuri]["windowDetails"][connkey].cleanup()
             del(self.conns[hvuri]["windowDetails"][connkey])
 
@@ -521,10 +521,10 @@ class vmmEngine(vmmGObject):
         focus, and use that
         """
         windowlist = [self.windowManager]
-        for conndict in self.conns.values():
-            windowlist.extend(conndict["windowDetails"].values())
+        for conndict in list(self.conns.values()):
+            windowlist.extend(list(conndict["windowDetails"].values()))
         windowlist.extend(
-            [conndict["windowHost"] for conndict in self.conns.values()])
+            [conndict["windowHost"] for conndict in list(self.conns.values())])
 
         use_win = None
         for window in windowlist:
@@ -600,7 +600,7 @@ class vmmEngine(vmmGObject):
                 self.conns[uri]["windowClone"].cleanup()
 
             details = self.conns[uri]["windowDetails"]
-            for win in details.values():
+            for win in list(details.values()):
                 win.cleanup()
 
             self.conns[uri]["conn"].cleanup()
@@ -620,7 +620,7 @@ class vmmEngine(vmmGObject):
         handle_id = vmmGObject.connect(self, name, callback, *args)
 
         if name == "conn-added":
-            for conn_dict in self.conns.values():
+            for conn_dict in list(self.conns.values()):
                 self.emit("conn-added", conn_dict["conn"])
 
         return handle_id
@@ -770,7 +770,7 @@ class vmmEngine(vmmGObject):
             return self.connect_to_uri(uri, autoconnect, probe=True)
 
         def cancelled(src):
-            if len(self.conns.keys()) == 0:
+            if len(list(self.conns.keys())) == 0:
                 self.exit_app(src)
 
         obj = vmmConnect()
