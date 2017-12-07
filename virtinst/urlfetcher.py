@@ -34,6 +34,7 @@ import urlparse
 import requests
 
 from .osdict import OSDB
+from virtinst import util
 
 
 #########################################################################
@@ -303,7 +304,8 @@ class _MountedURLFetcher(_LocalURLFetcher):
 
         logging.debug("Preparing mount at " + self._srcdir)
         if self.location.startswith("nfs:"):
-            cmd = [mountcmd, "-o", "ro", self.location[4:], self._srcdir]
+            url = util.sanitize_url(self.location)
+            cmd = [mountcmd, "-o", "ro", url[4:], self._srcdir]
         else:
             if stat.S_ISBLK(os.stat(self.location)[stat.ST_MODE]):
                 mountopt = "ro"

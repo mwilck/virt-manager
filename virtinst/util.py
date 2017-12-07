@@ -421,3 +421,22 @@ def getInstallRepos():
         return (0, [])
     return lookupZypperRepos(getHostInstallSource())
 
+def sanitize_url(url):
+    """
+    Do nothing for http or ftp, but make sure nfs is in the expected format
+    """
+    if url.startswith("nfs://"):
+        # Convert RFC compliant NFS      nfs://server/path/to/distro
+        # to what mount/anaconda expect  nfs:server:/path/to/distro
+        # and carry the latter form around internally
+        url = "nfs:" + url[6:]
+
+        # If we need to add the : after the server
+        index = url.find("/", 4)
+        if index == -1:
+            raise ValueError(_("Invalid NFS format: No path specified."))
+        if url[index - 1] != ":":
+            url = url[:index] + ":" + url[index:]
+
+    return url
+

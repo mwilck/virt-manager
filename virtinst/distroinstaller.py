@@ -44,6 +44,8 @@ def _sanitize_url(url):
     """
     Do nothing for http or ftp, but make sure nfs is in the expected format
     """
+    # This sanitize will be done later
+    return url
     if url.startswith("nfs://"):
         # Convert RFC compliant NFS      nfs://server/path/to/distro
         # to what mount/anaconda expect  nfs:server:/path/to/distro
