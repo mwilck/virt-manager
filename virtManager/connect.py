@@ -116,7 +116,7 @@ class vmmConnect(vmmGObjectUI):
 
         if (os.path.exists("/usr/bin/qemu") or
             os.path.exists("/usr/bin/qemu-kvm") or
-            os.path.exists("/usr/bin/kvm") or
+            os.path.exists("/usr/bin/qemu-system-x86_64") or
             os.path.exists("/usr/libexec/qemu-kvm") or
             glob.glob("/usr/bin/qemu-system-*")):
             return "qemu:///system"
