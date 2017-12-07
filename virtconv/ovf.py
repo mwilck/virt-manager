@@ -90,7 +90,7 @@ def node_list(node):
     child = node.children
     while child:
         child_list.append(child)
-        child = child.next
+        child = child.__next__
     return child_list
 
 

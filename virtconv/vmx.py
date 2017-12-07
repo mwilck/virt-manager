@@ -271,7 +271,7 @@ class vmx_parser(parser_class):
 
         def _find_keys(prefixes):
             ret = []
-            for key, value in config.items():
+            for key, value in list(config.items()):
                 for p in util.listify(prefixes):
                     if key.startswith(p):
                         ret.append((key, value))
