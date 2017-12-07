@@ -1086,7 +1086,7 @@ class vmmConnection(vmmGObject):
         self.caps.get_cpu_values(self.caps.host.cpu.arch)
 
         try:
-            self._backend.setKeepAlive(20, 1)
+            self._backend.setKeepAlive(20, 10)
         except Exception as e:
             if (not isinstance(e, AttributeError) and
                 not util.is_error_nosupport(e)):
