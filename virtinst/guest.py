@@ -125,7 +125,10 @@ class Guest(XMLBuilder):
         self.skip_default_channel = False
         self.skip_default_sound = False
         self.skip_default_usbredir = False
-        self.skip_default_graphics = False
+        if self.os.is_s390x():
+            self.skip_default_graphics = True
+        else:
+            self.skip_default_graphics = False
         self.skip_default_rng = False
         self.x86_cpu_default = self.cpu.SPECIAL_MODE_HOST_MODEL_ONLY
 
@@ -687,7 +690,7 @@ class Guest(XMLBuilder):
         self.add_device(dev)
 
     def add_default_video_device(self):
-        if self.os.is_container():
+        if self.os.is_container() or self.os.is_s390x():
             return
         if self.get_devices("video"):
             return
@@ -742,6 +745,8 @@ class Guest(XMLBuilder):
             dev.target_type = "virtio"
             dev.target_name = dev.CHANNEL_NAME_QEMUGA
             self.add_device(dev)
+        elif self.os.is_s390x():
+            dev.target_type = "sclp"
 
     def add_default_graphics(self):
         if self.skip_default_graphics:
@@ -750,7 +755,7 @@ class Guest(XMLBuilder):
             return
         if self.os.is_container() and not self.conn.is_vz():
             return
-        if self.os.arch not in ["x86_64", "i686", "ppc64", "ppc64le"]:
+        if self.os.arch not in ["x86_64", "i686", "ppc64", "ppc64le", "s390x"]:
             return
         self.add_device(VirtualGraphics(self.conn))
 
@@ -1086,7 +1091,7 @@ class Guest(XMLBuilder):
         if not os_support:
             return False
 
-        if self.os.is_x86():
+        if self.os.is_x86() or self.os.is_s390x():
             return True
 
         if (self.os.is_arm_vexpress() and
