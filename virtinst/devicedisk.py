@@ -570,6 +570,10 @@ class VirtualDisk(VirtualDevice):
         http://lists.gnu.org/archive/html/qemu-devel/2008-04/msg00675.html
         """
         if self.driver_name != self.DRIVER_NAME_QEMU:
+            if self.driver_name and \
+               self.driver_name != self.DRIVER_NAME_PHY and \
+               self.type != 'file':
+                return self.type
             return None
 
         drvtype = self._storage_backend.get_driver_type()
