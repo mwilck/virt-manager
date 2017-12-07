@@ -339,7 +339,7 @@ class RateEstimator:
         self.start_time = now
         self.last_update_time = now
         self.last_amount_read = 0
-        self.ave_rate = None
+        self.ave_rate = 0
 
     def update(self, amount_read, now=None):
         if now is None: now = time.time()
@@ -351,7 +351,7 @@ class RateEstimator:
             # if we just started this file, all bets are off
             self.last_update_time = now
             self.last_amount_read = amount_read
-            self.ave_rate = None
+            self.ave_rate = 0
             return
 
         #print 'times', now, self.last_update_time
