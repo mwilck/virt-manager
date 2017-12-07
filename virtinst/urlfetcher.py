@@ -446,9 +446,20 @@ def _distroFromSUSEContent(fetcher, arch, vmtype=None):
             arch = "ppc64le"
 
     def _parse_sle_distribution(d):
-        sle_version = d[1].strip().rsplit(' ')[4]
-        if len(d[1].strip().rsplit(' ')) > 5:
-            sle_version = sle_version + '.' + d[1].strip().rsplit(' ')[5][2]
+        d_list = d[1].strip().rsplit(' ')
+        d_len = len(d_list)
+        sle_version = 12
+        counter = 0
+        while counter < d_len:
+            item = d_list[counter].strip()
+            if item.isdigit():
+                sle_version = item
+                if counter+1 < d_len:
+                    item = d_list[counter+1].strip()
+                    if item[2].isdigit():
+                        sle_version = sle_version + '.' + item[2]
+                break
+            counter += 1
         return ['VERSION', sle_version]
 
     dclass = GenericDistro
