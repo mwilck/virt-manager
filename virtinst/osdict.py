@@ -363,8 +363,11 @@ class _OsVariant(object):
         eol_date = self._os.get_eol_date_string()
 
         if eol_date:
-            return (datetime.datetime.strptime(eol_date, "%Y-%m-%d") >
-                    datetime.datetime.now())
+            try:
+                eol_valid = datetime.datetime.strptime(eol_date, "%Y-%m-%d")
+                return (eol_valid > datetime.datetime.now())
+            except Exception:
+                pass
 
         if self.name == "fedora-unknown":
             return False
