@@ -145,8 +145,8 @@ def start_libvirtd():
         logging.debug("libvirtd not running, asking system-config-services "
                       "to start it")
         scs = Gio.DBusProxy.new_sync(bus, 0, None,
-                             "org.fedoraproject.Config.Services",
-                             "/org/fedoraproject/Config/Services/systemd1",
+                             "org.freedesktop.systemd1",
+                             "/org/freedesktop/systemd1",
                              "org.freedesktop.systemd1.Manager", None)
         scs.StartUnit("(ss)", unitname, "replace")
         time.sleep(2)
