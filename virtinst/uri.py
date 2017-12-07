@@ -19,7 +19,7 @@
 
 import logging
 import re
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 from .cli import parse_optstr_tuples
 
@@ -47,7 +47,7 @@ class URI(object):
     """
     def __init__(self, uri):
         self.uri = uri
-        unquoted_uri = urllib.unquote(uri)
+        unquoted_uri = urllib.parse.unquote(uri)
 
         (self.scheme, self.username, self.hostname,
          self.path, self.query, self.fragment) = self._split(unquoted_uri)

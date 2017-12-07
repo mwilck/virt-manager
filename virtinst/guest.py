@@ -434,7 +434,7 @@ class Guest(XMLBuilder):
                 domain.undefine()
             except Exception:
                 pass
-            raise exc_info[0], exc_info[1], exc_info[2]
+            raise exc_info[0](exc_info[1]).with_traceback(exc_info[2])
 
         if install_xml and install_xml != final_xml:
             domain = self.conn.defineXML(final_xml)
@@ -1075,7 +1075,7 @@ class Guest(XMLBuilder):
                                  (str(d), str(addresses[addrstr][addr.function])))
             addresses[addrstr][addr.function] = d
 
-        for devs in addresses.values():
+        for devs in list(addresses.values()):
             if len(devs) > 1 and 0 in devs:
                 devs[0].address.multifunction = True
 

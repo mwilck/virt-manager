@@ -19,7 +19,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 # MA 02110-1301 USA.
 
-from __future__ import print_function
+
 
 import argparse
 import collections
@@ -293,7 +293,7 @@ def _do_creds_authname(creds):
 
         res = cred[retindex]
         if credtype == libvirt.VIR_CRED_AUTHNAME:
-            res = raw_input(prompt)
+            res = input(prompt)
         elif credtype == libvirt.VIR_CRED_PASSPHRASE:
             import getpass
             res = getpass.getpass(prompt)
@@ -1159,7 +1159,7 @@ class VirtCLIParser(object):
         passed an invalid argument such as --disk idontexist=foo
         """
         if optdict:
-            fail(_("Unknown options %s") % optdict.keys())
+            fail(_("Unknown options %s") % list(optdict.keys()))
 
     def _parse(self, inst):
         """
@@ -1616,7 +1616,7 @@ class ParserBoot(VirtCLIParser):
     def _parse(self, inst):
         # Build boot order
         boot_order = []
-        for cliname in self.optdict.keys():
+        for cliname in list(self.optdict.keys()):
             if cliname not in inst.os.BOOT_DEVICES:
                 continue
 

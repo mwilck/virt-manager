@@ -79,7 +79,7 @@ def _sort(tosort, sortpref=None, limit_point_releases=False):
     retlist = []
     sortpref = sortpref or []
 
-    for key, osinfo in tosort.items():
+    for key, osinfo in list(tosort.items()):
         # Libosinfo has some duplicate version numbers here, so append .1
         # if there's a collision
         sortby = osinfo.sortby
@@ -98,12 +98,12 @@ def _sort(tosort, sortpref=None, limit_point_releases=False):
     # debian5, debian4, fedora14, fedora13
     #   rather than
     # debian4, debian5, fedora13, fedora14
-    for distro_list in distro_mappings.values():
+    for distro_list in list(distro_mappings.values()):
         distro_list.sort()
         distro_list.reverse()
 
     # Move the sortpref values to the front of the list
-    sorted_distro_list = distro_mappings.keys()
+    sorted_distro_list = list(distro_mappings.keys())
     sorted_distro_list.sort()
     sortpref.reverse()
     for prefer in sortpref:
@@ -258,7 +258,7 @@ class _OSDB(object):
         """
         sortmap = {}
 
-        for name, osobj in self._all_variants.items():
+        for name, osobj in list(self._all_variants.items()):
             if typename and typename != osobj.get_typename():
                 continue
             if only_supported and not osobj.get_supported():

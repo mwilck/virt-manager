@@ -19,7 +19,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 # MA 02110-1301 USA.
 
-import ConfigParser
+import configparser
 import ftplib
 import io
 import logging
@@ -28,8 +28,8 @@ import re
 import stat
 import subprocess
 import tempfile
-import urllib2
-import urlparse
+import urllib.request, urllib.error, urllib.parse
+import urllib.parse
 
 import requests
 
@@ -221,9 +221,13 @@ class _FTPURLFetcher(_URLFetcher):
             return
 
         try:
-            parsed = urlparse.urlparse(self.location)
+            parsed = urllib.parse.urlparse(self.location)
             self._ftp = ftplib.FTP()
-            self._ftp.connect(parsed.hostname, parsed.port)
+            if parsed.port is None:
+                port = 0
+            else:
+                port = parsed.port
+            self._ftp.connect(parsed.hostname, port)
             self._ftp.login()
             # Force binary mode
             self._ftp.voidcmd("TYPE I")
@@ -235,9 +239,9 @@ class _FTPURLFetcher(_URLFetcher):
         """
         Use urllib2 and ftplib to grab the file
         """
-        request = urllib2.Request(url)
-        urlobj = urllib2.urlopen(request)
-        size = self._ftp.size(urlparse.urlparse(url)[2])
+        request = urllib.request.Request(url)
+        urlobj = urllib.request.urlopen(request)
+        size = self._ftp.size(urllib.parse.urlparse(url)[2])
         return urlobj, size
 
 
@@ -253,7 +257,7 @@ class _FTPURLFetcher(_URLFetcher):
         self._ftp = None
 
     def _hasFile(self, url):
-        path = urlparse.urlparse(url)[2]
+        path = urllib.parse.urlparse(url)[2]
 
         try:
             try:
@@ -278,7 +282,7 @@ class _LocalURLFetcher(_URLFetcher):
         return os.path.exists(url)
 
     def _grabber(self, url):
-        urlobj = open(url, "r")
+        urlobj = open(url, "rb")
         size = os.path.getsize(url)
         return urlobj, size
 
@@ -371,14 +375,14 @@ def _grabTreeinfo(fetcher):
         return None
 
     try:
-        treeinfo = ConfigParser.SafeConfigParser()
+        treeinfo = configparser.SafeConfigParser()
         treeinfo.read(tmptreeinfo)
     finally:
         os.unlink(tmptreeinfo)
 
     try:
         treeinfo.get("general", "family")
-    except ConfigParser.NoSectionError:
+    except configparser.NoSectionError:
         logging.debug("Did not find 'family' section in treeinfo")
         return None
 
@@ -391,11 +395,13 @@ def _distroFromSUSEContent(fetcher, arch, vmtype=None):
     # None if no content, GenericDistro if unknown label type.
     try:
         cbuf = fetcher.acquireFileContent("content")
+        cbuf = cbuf.decode()
     except ValueError:
         try:
             # If no content file, try media.1/products and media.1/build and create
             # a cbuf with enough info for the content file parsing code below to work
             pbuf = fetcher.acquireFileContent("media.1/products").strip()
+            pbuf = pbuf.decode()
             pbuf = pbuf.split(' ', 1)[1].strip()
             # The media.1/products file naming convention changed between SLE11 and SLE12
             if pbuf.startswith('SLE'):
@@ -404,6 +410,7 @@ def _distroFromSUSEContent(fetcher, arch, vmtype=None):
             cbuf = "\nDISTRO ," + pbuf.replace('-', ' ')
             try:
                 bbuf = fetcher.acquireFileContent("media.1/build").split('-')
+                bbuf = bbuf.decode()
             except:
                 bbuf = ["x86_64"]
             cbuf = cbuf + "\n" + " ".join(bbuf)
@@ -618,7 +625,7 @@ class Distro(object):
             try:
                 kernelpath = self._getTreeinfoMedia("kernel")
                 initrdpath = self._getTreeinfoMedia("initrd")
-            except ConfigParser.NoSectionError:
+            except configparser.NoSectionError:
                 pass
 
         if not kernelpath or not initrdpath:
@@ -685,6 +692,7 @@ class Distro(object):
         # Fetch 'filename' and return True/False if it matches the regex
         try:
             content = self.fetcher.acquireFileContent(filename)
+            content = content.decode()
         except ValueError:
             return False
 
@@ -754,15 +762,15 @@ class GenericDistro(Distro):
                     self._valid_kernel_path = (
                         self._getTreeinfoMedia("kernel"),
                         self._getTreeinfoMedia("initrd"))
-                except (ConfigParser.NoSectionError,
-                        ConfigParser.NoOptionError) as e:
+                except (configparser.NoSectionError,
+                        configparser.NoOptionError) as e:
                     logging.debug(e)
 
             if self.treeinfo.has_section(isoSection):
                 try:
                     self._valid_iso_path = self.treeinfo.get(isoSection,
                                                              "boot.iso")
-                except ConfigParser.NoOptionError as e:
+                except configparser.NoOptionError as e:
                     logging.debug(e)
 
         if self.type == "xen":
@@ -1437,7 +1445,7 @@ class ALTLinuxDistro(Distro):
 # Build list of all *Distro classes
 def _build_distro_list():
     allstores = []
-    for obj in globals().values():
+    for obj in list(globals().values()):
         if isinstance(obj, type) and issubclass(obj, Distro) and obj.name:
             allstores.append(obj)
 

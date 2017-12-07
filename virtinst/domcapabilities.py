@@ -139,7 +139,7 @@ class DomainCapabilities(XMLBuilder):
                 return _("BIOS")
             return _("None")
 
-        for arch, patterns in self._uefi_arch_patterns.items():
+        for arch, patterns in list(self._uefi_arch_patterns.items()):
             for pattern in patterns:
                 if re.match(pattern, path):
                     return (_("UEFI %(arch)s: %(path)s") %
@@ -151,7 +151,7 @@ class DomainCapabilities(XMLBuilder):
         """
         Return True if we know how to setup UEFI for the passed arch
         """
-        return self.arch in self._uefi_arch_patterns.keys()
+        return self.arch in list(self._uefi_arch_patterns.keys())
 
     def supports_uefi_xml(self):
         """

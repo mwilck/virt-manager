@@ -68,7 +68,7 @@ def _sanitize_url(url):
  MEDIA_LOCATION_URL,
  MEDIA_CDROM_PATH,
  MEDIA_CDROM_URL,
- MEDIA_CDROM_IMPLIED) = range(1, 7)
+ MEDIA_CDROM_IMPLIED) = list(range(1, 7))
 
 
 class DistroInstaller(Installer):

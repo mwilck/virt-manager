@@ -87,7 +87,7 @@ def _is_dir_searchable(uid, username, path):
         logging.debug("Cmd '%s' failed: %s", cmd, err)
         return False
 
-    return bool(re.search("user:%s:..x" % username, out))
+    return bool(re.search("user:%s:..x" % username, out.decode()))
 
 
 class _DiskSeclabel(XMLBuilder):
@@ -445,7 +445,7 @@ class VirtualDisk(VirtualDevice):
                 digit = 1
 
             seen_valid = True
-            gen_t += "%c" % (ord('a') + digit - 1)
+            gen_t += "%c" % int(ord('a') + digit - 1)
 
         return gen_t
 
@@ -1022,11 +1022,11 @@ class VirtualDisk(VirtualDevice):
         def get_target():
             first_found = None
 
-            ran = range(maxnode)
+            ran = list(range(maxnode))
             if pref_ctrl is not None:
                 # We assume narrow SCSI bus and libvirt assigning 7
                 # (1-7, 8-14, etc.) devices per controller
-                ran = range(pref_ctrl * 7, (pref_ctrl + 1) * 7)
+                ran = list(range(pref_ctrl * 7, (pref_ctrl + 1) * 7))
 
             for i in ran:
                 postfix = self.num_to_target(i + 1)
