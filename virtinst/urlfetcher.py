@@ -458,6 +458,10 @@ def _distroFromSUSEContent(fetcher, arch, vmtype=None):
             dclass = SLEDDistro
             if distro_version is None:
                 distro_version = _parse_sle_distribution(distribution)
+        elif re.match(".*Open Enterprise Server*", distribution[1]):
+            dclass = OESDistro
+            if distro_version is None:
+                distro_version = _parse_sle_distribution(distribution)
         elif re.match(".*openSUSE.*", distribution[1]):
             dclass = OpensuseDistro
             if distro_version is None:
@@ -1018,20 +1022,30 @@ class SuseDistro(Distro):
         distro_version = self.version_from_content[1].strip()
         version = distro_version.split('.', 1)[0].strip()
         self.os_variant = self.urldistro
-        if int(version) >= 10:
-            if self.os_variant.startswith(("sles", "sled")):
-                sp_version = None
-                if len(distro_version.split('.', 1)) == 2:
-                    sp_version = 'sp' + distro_version.split('.', 1)[1].strip()
-                self.os_variant += version
-                if sp_version:
-                    self.os_variant += sp_version
+
+        sp_version = None
+        if self.os_variant.startswith(("sles", "sled")):
+            if len(distro_version.split('.', 1)) == 2:
+                sp_version = 'sp' + distro_version.split('.', 1)[1].strip()
+            self.os_variant += version
+            if sp_version:
+                self.os_variant += sp_version
+        elif self.os_variant.startswith("opensuse"):
+            if len(version) == 8:
+                self.os_variant += "tumbleweed"
             else:
-                # Tumbleweed 8 digit date
-                if len(version) == 8:
-                    self.os_variant += "tumbleweed"
-                else:
-                    self.os_variant += distro_version
+                self.os_variant += distro_version
+        elif self.os_variant.startswith("oes"):
+            versions = distro_version.split('.')
+            major_version = versions[0]
+            if len(versions) == 3:
+                sp_version = versions[2]
+            elif len(versions) == 2:
+                sp_version = versions[1]
+            if sp_version:
+                self.os_variant += major_version + 'sp' + sp_version
+            else:
+                self.os_variant += major_version
         else:
             self.os_variant += "9"
 
@@ -1077,6 +1091,9 @@ class SLESDistro(SuseDistro):
 
 class SLEDDistro(SuseDistro):
     urldistro = "sled"
+
+class OESDistro(SuseDistro):
+    urldistro = "oes"
 
 
 # Suse  image store is harder - we fetch the kernel RPM and a helper
