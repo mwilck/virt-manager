@@ -843,7 +843,7 @@ class vmmManager(vmmGObjectUI):
             show_pause = bool(vm and vm.is_unpauseable())
         else:
             show_pause = bool(vm and vm.is_pauseable())
-        show_shutdown = bool(vm and vm.is_stoppable())
+        show_shutdown = bool(vm and vm.is_destroyable())
 
         if vm and vm.managedsave_supported:
             self.change_run_text(vm.has_managed_save())

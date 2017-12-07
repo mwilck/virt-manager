@@ -31,6 +31,7 @@ class _VMMenu(Gtk.Menu):
         self._parent = src
         self._current_vm_cb = current_vm_cb
         self._show_open = show_open
+        self._shutdown = None
 
         self._init_state()
 
@@ -92,6 +93,7 @@ class VMShutdownMenu(_VMMenu):
             name = getattr(child, "vmm_widget_name", None)
             if name in statemap:
                 child.set_sensitive(statemap[name])
+                child.set_visible(statemap[name])
 
             if name == "reset":
                 child.set_tooltip_text(None)
@@ -108,7 +110,8 @@ class VMActionMenu(_VMMenu):
         self._add_action(_("_Pause"), "suspend", Gtk.STOCK_MEDIA_PAUSE)
         self._add_action(_("R_esume"), "resume", Gtk.STOCK_MEDIA_PAUSE)
         s = self._add_action(_("_Shut Down"), "shutdown", addcb=False)
-        s.set_submenu(VMShutdownMenu(self._parent, self._current_vm_cb))
+        self._shutdown = VMShutdownMenu(self._parent, self._current_vm_cb)
+        s.set_submenu(self._shutdown)
 
         self.add(Gtk.SeparatorMenuItem())
         self._add_action(_("Clone..."), "clone", None)
@@ -124,7 +127,7 @@ class VMActionMenu(_VMMenu):
     def update_widget_states(self, vm):
         statemap = {
             "run": bool(vm and vm.is_runable()),
-            "shutdown": bool(vm and vm.is_stoppable()),
+            "shutdown": bool(vm and vm.is_destroyable()),
             "suspend": bool(vm and vm.is_stoppable()),
             "resume": bool(vm and vm.is_paused()),
             "migrate": bool(vm and vm.is_stoppable()),
@@ -141,6 +144,8 @@ class VMActionMenu(_VMMenu):
                 child.get_submenu().update_widget_states(vm)
             if name in statemap:
                 child.set_sensitive(statemap[name])
+                if name == "shutdown" and self._shutdown:
+                    self._shutdown.update_widget_states(vm)
             if name in vismap:
                 child.set_visible(vismap[name])
 
