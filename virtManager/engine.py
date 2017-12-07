@@ -257,9 +257,22 @@ class vmmEngine(vmmGObject):
 
     def load_stored_uris(self):
         uris = self.config.get_conn_uris() or []
+        tryuri = vmmConnect.default_uri()
+        found_uri = None
         for uri in uris:
+            # If booted Xen, don't try connecting to local qemu
+            # Likewise if booted native, don't try connecting to local xen
+            if uri == 'xen:///' or uri == 'qemu:///system':
+                if tryuri and tryuri != uri:
+                    logging.debug("Skipping %s because it is incompatible with local host", uri)
+                    continue
+            found_uri = True
             conn = self.make_conn(uri)
             self.register_conn(conn, skip_config=True)
+        if tryuri and found_uri is None:
+            logging.debug("Didn't connect with anything, try default %s", tryuri)
+            conn = self.make_conn(tryuri)
+            self.register_conn(conn, skip_config=False)
 
     def autostart_conns(self):
         """
