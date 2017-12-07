@@ -1025,8 +1025,12 @@ class SuseDistro(Distro):
                                            "boot/%s/initrd" % self.arch))
 
             # Matches Opensuse > 10.2 and sles 10
-            self._xen_kernel_paths = [("boot/%s/vmlinuz-xen" % self.arch,
-                                        "boot/%s/initrd-xen" % self.arch)]
+            if self.arch == "i386":
+                self._xen_kernel_paths = [("boot/%s/vmlinuz-xenpae" % self.arch,
+                                            "boot/%s/initrd-xenpae" % self.arch)]
+            else:
+                self._xen_kernel_paths = [("boot/%s/vmlinuz-xen" % self.arch,
+                                            "boot/%s/initrd-xen" % self.arch)]
 
     def _variantFromVersion(self):
         distro_version = self.version_from_content[1].strip()
