@@ -897,14 +897,11 @@ class Guest(XMLBuilder):
             self.emulator = None
             return
 
-        if self.emulator:
-            return
-
         if self.os.is_hvm() and self.type == "xen":
-            if self.conn.caps.host.cpu.arch == "x86_64":
-                self.emulator = "/usr/lib64/xen/bin/qemu-dm"
-            else:
-                self.emulator = "/usr/lib/xen/bin/qemu-dm"
+            # Force not using Xen's old qemu-dm except for remote
+            # connections where we don't know the Xen version
+            if not self.conn.is_remote() or not self.emulator:
+                self.emulator = "/usr/lib/xen/bin/qemu-system-i386"
 
     def _set_cpu_defaults(self):
         self.cpu.set_topology_defaults(self.vcpus)
