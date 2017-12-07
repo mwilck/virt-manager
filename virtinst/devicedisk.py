@@ -1004,6 +1004,17 @@ class VirtualDisk(VirtualDevice):
         @rtype C{str}
         """
         prefix, maxnode = self.get_target_prefix(skip_targets)
+        postfix_targets = []
+        if self.conn.is_xen():
+            prefixes = [ "hd", "xvd", "vd", "sd", "fd" ]
+            for x in skip_targets:
+                if x is None:
+                    continue
+                for p in prefixes:
+                    found = x.split(p,1)
+                    if found and len(found) == 2:
+                        postfix_targets.append(found[1])
+                        break
         skip_targets = [t for t in skip_targets if t and t.startswith(prefix)]
         skip_targets.sort()
 
@@ -1017,7 +1028,12 @@ class VirtualDisk(VirtualDevice):
                 ran = range(pref_ctrl * 7, (pref_ctrl + 1) * 7)
 
             for i in ran:
-                gen_t = prefix + self.num_to_target(i + 1)
+                postfix = self.num_to_target(i + 1)
+                gen_t = prefix + postfix
+                if self.conn.is_xen() and postfix in postfix_targets:
+                    if gen_t in skip_targets:
+                        skip_targets.remove(gen_t)
+                    continue
                 if gen_t in skip_targets:
                     skip_targets.remove(gen_t)
                     continue
