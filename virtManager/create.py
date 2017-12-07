@@ -757,7 +757,12 @@ class vmmCreate(vmmGObjectUI):
         if gtype is None:
             # If none specified, prefer HVM so install options aren't limited
             # with a default PV choice.
+            # If xen connection, favor PV installation
+            conn_is_xen = self.conn.is_xen()
             for g in self.conn.caps.guests:
+                if conn_is_xen and g.os_type == "xen":
+                    gtype = "xen"
+                    break
                 if g.os_type == "hvm":
                     gtype = "hvm"
                     break
