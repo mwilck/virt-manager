@@ -1449,6 +1449,9 @@ class vmmDetails(vmmGObjectUI):
     def control_vm_run(self, src_ignore):
         if self.has_unapplied_changes(self.get_hw_row()):
             return
+        # De-sensitize widget so a double click on the icon won't attempt to
+        # start the VM twice
+        self.widget("control-run").set_sensitive(False)
         self.emit("action-run-domain",
                   self.vm.conn.get_uri(), self.vm.get_connkey())
 
