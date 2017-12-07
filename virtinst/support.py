@@ -259,7 +259,7 @@ SUPPORT_CONN_DISK_SD = _make(version="1.1.2")
 # default to qcow2. It might be fine for xen or qemu older than the versions
 # here, but until someone tests things I'm going to be a bit conservative.
 SUPPORT_CONN_DEFAULT_QCOW2 = _make(
-    version="0.8.0", hv_version={"qemu": "1.2.0", "test": 0})
+    version="0.8.0", hv_version={"qemu": "1.2.0", "all": 0})
 SUPPORT_CONN_DEFAULT_USB2 = _make(
     version="0.9.7", hv_version={"qemu": "1.0.0", "test": 0})
 SUPPORT_CONN_CAN_ACPI = _make(hv_version={"xen": "3.1.0", "all": 0})
