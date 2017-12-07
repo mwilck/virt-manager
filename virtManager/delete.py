@@ -241,7 +241,7 @@ def populate_storage_list(storage_list, vm, conn):
     diskdata.append(("dtb", vm.get_xmlobj().os.dtb, True, False, True))
 
     for target, path, ro, shared, is_media in diskdata:
-        if not path:
+        if not path or path == "/usr/lib/grub2/x86_64-xen/grub.xen":
             continue
 
         # There are a few pieces here
