@@ -397,8 +397,20 @@ class vmmCreate(vmmGObjectUI):
         self.widget("method-local").set_active(True)
         self.widget("create-conn").set_active(-1)
         activeconn = self._populate_conn_list(urihint)
-        self.widget("arch-expander").set_expanded(False)
         self.widget("vz-virt-type-hvm").set_active(True)
+        # For Xen have the expander open so users can see PV is the default
+        if activeconn and activeconn.is_xen():
+            self.widget("arch-expander").set_expanded(True)
+        else:
+            self.widget("arch-expander").set_expanded(False)
+
+        # Default to Network install if host was installed that way
+        host_instsrc = util.getHostInstallSource()
+        if host_instsrc is not None and \
+           (host_instsrc.startswith('ftp:') or host_instsrc.startswith('http:') or \
+            host_instsrc.startswith('smb:') or host_instsrc.startswith('nfs:')):
+            self.widget("method-local").set_active(False)
+            self.widget("method-tree").set_active(True)
 
         if self._set_conn(activeconn) is False:
             return False
