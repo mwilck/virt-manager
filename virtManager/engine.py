@@ -236,9 +236,6 @@ class vmmEngine(vmmGObject):
         except Exception:
             logging.exception("Error talking to PackageKit")
 
-        if tryuri is None:
-            tryuri = "qemu:///system"
-
         warnmsg = _("The 'libvirtd' service will need to be started.\n\n"
                     "After that, virt-manager will connect to libvirt on\n"
                     "the next application start up.")
@@ -252,7 +249,11 @@ class vmmEngine(vmmGObject):
             if not connected and do_start:
                 manager.err.ok(_("Libvirt service must be started"), warnmsg)
 
-        self.idle_add(idle_connect)
+        # If there is no default URI to be found, show the new connection dialog
+        if tryuri is None:
+            self._do_show_connect(self.windowManager)
+        else:
+            self.idle_add(idle_connect)
 
 
     def load_stored_uris(self):
