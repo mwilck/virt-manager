@@ -30,6 +30,7 @@ import math
 import fcntl
 import struct
 import termios
+from six import integer_types
 
 # Code from http://mail.python.org/pipermail/python-list/2000-May/033365.html
 def terminal_width(fd=1):
@@ -481,7 +482,7 @@ def format_number(number, SI=0, space=' '):
         depth  = depth + 1
         number = number / step
 
-    if isinstance(number, int) or isinstance(number, int):
+    if isinstance(number, integer_types):
         # it's an int or a long, which means it didn't get divided,
         # which means it's already short enough
         fmt = '%i%s%s'
