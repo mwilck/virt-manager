@@ -96,11 +96,11 @@ def openconn(uri):
         conn.fetch_all_nodedevs()
 
         _conn_cache[uri] = {}
-        for key, value in conn._fetch_cache.items():
+        for key, value in list(conn._fetch_cache.items()):
             _conn_cache[uri][key] = value[:]
 
     # Prime the internal connection cache
-    for key, value in _conn_cache[uri].items():
+    for key, value in list(_conn_cache[uri].items()):
         conn._fetch_cache[key] = value[:]
 
     def cb_cache_new_pool(poolobj):

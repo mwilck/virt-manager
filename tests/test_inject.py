@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # Copyright (C) 2013, 2014 Red Hat, Inc.
 
-from __future__ import print_function
+
 
 import atexit
 import os
@@ -29,7 +29,7 @@ FEDORA_URL = "http://dl.fedoraproject.org/pub/fedora/linux/releases/%s/Server/%s
 
 (WARN_RHEL4,
  WARN_RHEL5,
- WARN_LATEST) = range(1, 4)
+ WARN_LATEST) = list(range(1, 4))
 
 
 def prompt():
@@ -185,7 +185,7 @@ def _make_tests():
         return lambda s: _test_distro(_d)
 
     idx = 0
-    for dname, dobj in _alldistros.items():
+    for dname, dobj in list(_alldistros.items()):
         idx += 1
         setattr(FetchTests, "testFetch%.3d_%s" %
                 (idx, dname.replace("-", "_")), _make_fetch_cb(dobj))

@@ -346,7 +346,7 @@ def _make_tests():
             d.distroclass = None
             urls[d.name] = d
 
-    keys = urls.keys()
+    keys = list(urls.keys())
     keys.sort()
     for key in keys:
         distroobj = urls[key]
