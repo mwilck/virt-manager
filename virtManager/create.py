@@ -847,11 +847,6 @@ class vmmCreate(vmmGObjectUI):
         for guest in self.conn.caps.guests:
             if guest.os_type == self._capsinfo.os_type:
                 archs.append(guest.arch)
-
-        # Combine x86/i686 to avoid confusion
-        if (self.conn.caps.host.cpu.arch == "x86_64" and
-            "x86_64" in archs and "i686" in archs):
-            archs.remove("i686")
         archs.sort()
 
         prios = ["x86_64", "i686", "aarch64", "armv7l", "ppc64", "ppc64le",
